@@ -1,0 +1,47 @@
+---
+title: "class-11-19-19"
+author: "Harrison Burke"
+date: "11/19/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(skimr)
+library(tidyverse)
+library()
+```
+
+```{r}
+az <- read.csv("2018-live-poll-results-master/data/elections-poll-az02-1.csv")
+
+
+```
+
+```{r}
+list <- fs::dir_ls("2018-live-poll-results-master/data/")
+
+raw <- map_dfr(list, read.csv)
+
+fs::file_delete("2018-live-poll-results-master.zip")
+```
+
+
+```{r}
+x <- raw %>%
+  mutate(dvote = ifelse(response == "Dem", 1, 0)) %>%
+  mutate(female = ifelse(gender == "Female", 1, 0)) %>%
+  select(dvote, female, response, gender)
+
+line <- glm(data = x, dvote ~ female, family = "binomial")
+
+ggplot(x, aes(x = female, y = dvote)) + 
+  geom_jitter(height = .1, width = .1, alpha = .025) +
+  #geom_smooth(method = "glm", se = F) +
+  geom_abline(slope = line$coefficients["(Intercept)"], intercept = line$coefficients["female"])
+ 
+
+
+
+```
+
